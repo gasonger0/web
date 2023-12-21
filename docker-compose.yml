@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  backend:
+    image: php:8.1-fpm
+    volumes:
+      - './back:/var/www/html'
+    expose:
+      - "5000" 
+    networks:
+      - db-net
+      - global-net
+  frontend:
+    image: php:8.1-fpm
+    volumes: 
+      - './front:/var/www/html'
+    expose:
+      - "6000" 
+    networks:
+      - global-net
+
+  db:
+    image: postgres:13.3
+    environment:
+      POSTGRES_DB: "lr"
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "password"
+    ports:
+      - 5432:5432
+    networks:
+      - db-net
+  nginx: 
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - './back:/var/www/html'
+      - './nginx/conf.d:/etc/nginx/conf.d'
+    networks:
+      - global-net
+networks:
+  db-net:
+    driver: bridge
+  global-net:
+    driver: bridge
